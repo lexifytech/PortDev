@@ -1,7 +1,72 @@
-import { Github, Globe, Linkedin, Twitter } from "lucide-react"
+'use client';
 
+import { Github, Globe, Linkedin, Twitter } from "lucide-react"
+import { useState, useEffect, useRef } from 'react';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+
+function Carousel({ assets }: { assets: any[] }) {
+  const [nav1, setNav1] = useState<Slider | null>(null);
+  const slider1 = useRef<Slider>(null);
+  const slider2 = useRef<Slider>(null);
+
+  useEffect(() => {
+    setNav1(slider1.current);
+  }, []);
+
+  const mainSettings = {
+    arrows: true,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    infinite: true,
+    autoplay: false,
+    dots: true,
+    focusOnSelect: true,
+    customPaging: (i: number) => {
+      const asset = assets[i];
+      return (
+        <a>
+          <div style={{ backgroundColor: '#146864' }} className="w-5 h-5 rounded-lg" />
+        </a>
+      );
+    },
+  };
+
+  const thumbSettings = {
+    arrows: false,
+    asNavFor: nav1 as Slider,
+    slidesToShow: assets.length >= 3 ? 3 : assets.length,
+    swipeToSlide: true,
+    focusOnSelect: true,
+  };
+
+  return (
+    <div>
+      <Slider {...mainSettings} ref={slider1}>
+        {assets.map((asset, index) => (
+          <div key={asset.id || index} className="p-1">
+            {asset.type === "image" ? (
+              <img
+                src={asset.url || "/placeholder.svg"}
+                alt={`Slide ${index + 1}`}
+                className="w-full h-auto object-cover rounded-lg"
+              />
+            ) : (
+              <video
+                src={asset.url}
+                controls
+                className="w-full h-auto object-cover rounded-lg"
+              />
+            )}
+          </div>
+        ))}
+      </Slider>
+    </div>
+  );
+}
 
 export function MinimalTemplate({ portfolio }) {
   const { data } = portfolio
@@ -84,17 +149,7 @@ export function MinimalTemplate({ portfolio }) {
             {data.projects.map((project) => (
               <Card key={project.id} className="overflow-hidden border hover:border-teal transition-colors">
                 {project.assets && project.assets.length > 0 && (
-                  <div className="aspect-video w-full overflow-hidden bg-muted">
-                    {project.assets[0].type === "image" ? (
-                      <img
-                        src={project.assets[0].url || "/placeholder.svg"}
-                        alt={project.title}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <video src={project.assets[0].url} controls className="h-full w-full object-cover" />
-                    )}
-                  </div>
+                  <Carousel assets={project.assets} />
                 )}
                 <CardContent className="p-4">
                   <h3 className="text-xl font-bold mb-2 text-teal">{project.title}</h3>
@@ -149,4 +204,3 @@ export function MinimalTemplate({ portfolio }) {
     </div>
   )
 }
-
