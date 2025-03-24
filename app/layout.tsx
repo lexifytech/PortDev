@@ -14,7 +14,10 @@ export const metadata: Metadata = {
   title: "PortDev - Create Your Developer Portfolio",
   description:
     "Create a stunning portfolio in minutes. Choose from beautiful templates and share your work with the world.",
-    generator: 'v0.dev'
+    generator: 'v0.dev',
+    icons: {
+      icon: "icon.png", // Caminho relativo à pasta public
+    },
 }
 
 export default async function RootLayout({
