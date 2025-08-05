@@ -142,8 +142,9 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold gradient-text">Your Portfolio</h1>
             {portfolio?.published && (
+              // Linha 127 - Botão "View Published Portfolio"
               <Button variant="outline" asChild className="border-teal text-teal hover:bg-teal/10">
-                <a href={`/p/${portfolio.slug}`} target="_blank" rel="noopener noreferrer">
+                <a href={`/${portfolio.slug}`} target="_blank" rel="noopener noreferrer">
                   View Published Portfolio
                 </a>
               </Button>
@@ -222,7 +223,7 @@ export default function DashboardPage() {
                         <h3 className="text-lg font-medium text-teal">Public URL</h3>
                         <div className="flex items-center gap-2">
                           <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
-                            {`${window.location.origin}/p/${portfolio.slug}`}
+                            {`${window.location.origin}/${portfolio.slug}`}
                           </code>
                           <Button
                             variant="outline"
@@ -238,7 +239,7 @@ export default function DashboardPage() {
                       </div>
                       <div className="mt-4">
                         <Button asChild className="bg-teal hover:bg-teal/90">
-                          <a href={`/p/${portfolio.slug}`} target="_blank" rel="noopener noreferrer">
+                          <a href={`/${portfolio.slug}`} target="_blank" rel="noopener noreferrer">
                             Open Portfolio
                           </a>
                         </Button>
