@@ -37,7 +37,8 @@ export async function POST(request: NextRequest) {
       // Create a slug based on the user's name or a random ID
       const baseName = portfolio.data.name ? portfolio.data.name.toLowerCase().replace(/\s+/g, "-") : nanoid(8)
       
-      slug = `${baseName}-${nanoid(6)}`
+      // Use only a unique ID instead of name + ID
+      slug = nanoid(12) // Generates a unique 12-character ID
       
       // Store a reference to the portfolio by slug for public access
       await redis.set(`slug:${slug}`, email)
