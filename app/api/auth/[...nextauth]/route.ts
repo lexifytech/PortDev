@@ -1,6 +1,7 @@
 import { Redis } from "@upstash/redis"
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
+import { nanoid } from "nanoid"
 
 // Initialize Upstash Redis client
 const redis = new Redis({
@@ -26,6 +27,10 @@ const handler = NextAuth({
         const existingUser = await redis.get(`user:${user.email}`)
 
         if (!existingUser) {
+          // Generate unique slug for new user
+          const baseName = user.name ? user.name.toLowerCase().replace(/\s+/g, "-") : nanoid(8)
+          const slug = `${baseName}-${nanoid(6)}`
+
           // Create new user in database
           await redis.set(`user:${user.email}`, {
             id: user.id,
@@ -35,11 +40,12 @@ const handler = NextAuth({
             createdAt: new Date().toISOString(),
           })
 
-          // Create empty portfolio for new user
+          // Create empty portfolio for new user with slug
           await redis.set(`portfolio:${user.email}`, {
             userId: user.id,
             template: "minimal",
             published: false,
+            slug: slug, // Add slug here
             data: {
               name: user.name || "",
               title: "",
@@ -51,6 +57,9 @@ const handler = NextAuth({
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           })
+
+          // Reserve the slug
+          await redis.set(`slug:${slug}`, user.email)
         }
 
         return true
