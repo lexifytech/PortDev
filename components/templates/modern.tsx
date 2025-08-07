@@ -15,6 +15,7 @@ function Carousel({ assets }: { assets: any[] }) {
   const slider1 = useRef<Slider>(null);
   const slider2 = useRef<Slider>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const carouselId = useRef(`carousel-${Math.random().toString(36).substr(2, 9)}`);
 
   useEffect(() => {
     setNav1(slider1.current);
@@ -22,12 +23,16 @@ function Carousel({ assets }: { assets: any[] }) {
 
   useEffect(() => {
     if (carouselRef.current) {
-      const prevArrow = carouselRef.current.querySelector('.slick-prev');
-      const nextArrow = carouselRef.current.querySelector('.slick-next');
+      const prevArrow = carouselRef.current.querySelector('.slick-prev') as HTMLElement;
+      const nextArrow = carouselRef.current.querySelector('.slick-next') as HTMLElement;
       
       if (prevArrow && nextArrow) {
         prevArrow.classList.remove('pulse-last');
         nextArrow.classList.remove('pulse-first');
+        
+        // Control arrow visibility directly
+        prevArrow.style.display = currentSlide === 0 ? 'none' : 'block';
+        nextArrow.style.display = currentSlide === assets.length - 1 ? 'none' : 'block';
         
         if (currentSlide === 0) {
           nextArrow.classList.add('pulse-first');
@@ -65,7 +70,7 @@ function Carousel({ assets }: { assets: any[] }) {
   };
 
   return (
-    <div className="relative" ref={carouselRef}>
+    <div className={`relative ${carouselId.current}`} ref={carouselRef}>
       <Slider {...mainSettings} ref={slider1}>
         {assets.map((asset, index) => (
           <div key={asset.id || index} className="p-1">
@@ -85,16 +90,6 @@ function Carousel({ assets }: { assets: any[] }) {
           </div>
         ))}
       </Slider>
-      
-      <style jsx global>{`
-        .slick-prev {
-          display: ${currentSlide === 0 ? 'none' : 'block'} !important;
-        }
-        
-        .slick-next {
-          display: ${currentSlide === assets.length - 1 ? 'none' : 'block'} !important;
-        }
-      `}</style>
     </div>
   );
 }
