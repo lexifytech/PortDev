@@ -7,24 +7,50 @@ import { useState, useEffect, useRef } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { Portfolio } from "@/lib/types";
 
 function Carousel({ assets }: { assets: any[] }) {
   const [nav1, setNav1] = useState<Slider | null>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const slider1 = useRef<Slider>(null);
   const slider2 = useRef<Slider>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setNav1(slider1.current);
   }, []);
 
+  useEffect(() => {
+    if (carouselRef.current) {
+      const prevArrow = carouselRef.current.querySelector('.slick-prev');
+      const nextArrow = carouselRef.current.querySelector('.slick-next');
+      
+      if (prevArrow && nextArrow) {
+        prevArrow.classList.remove('pulse-last');
+        nextArrow.classList.remove('pulse-first');
+        
+        if (currentSlide === 0) {
+          nextArrow.classList.add('pulse-first');
+        }
+        
+        if (currentSlide === assets.length - 1) {
+          prevArrow.classList.add('pulse-last');
+        }
+      }
+    }
+  }, [currentSlide, assets.length]);
+
   const mainSettings = {
     arrows: true,
     slidesToShow: 1,
     slidesToScroll: 1,
-    infinite: true,
+    infinite: false,
     autoplay: false,
     dots: true,
     focusOnSelect: true,
+    beforeChange: (current: number, next: number) => {
+      setCurrentSlide(next);
+    },
     customPaging: (i: number) => {
       const asset = assets[i];
       return (
@@ -39,7 +65,7 @@ function Carousel({ assets }: { assets: any[] }) {
   };
 
   return (
-    <div>
+    <div className="relative" ref={carouselRef}>
       <Slider {...mainSettings} ref={slider1}>
         {assets.map((asset, index) => (
           <div key={asset.id || index} className="p-1">
@@ -59,11 +85,21 @@ function Carousel({ assets }: { assets: any[] }) {
           </div>
         ))}
       </Slider>
+      
+      <style jsx global>{`
+        .slick-prev {
+          display: ${currentSlide === 0 ? 'none' : 'block'} !important;
+        }
+        
+        .slick-next {
+          display: ${currentSlide === assets.length - 1 ? 'none' : 'block'} !important;
+        }
+      `}</style>
     </div>
   );
 }
 
-export function ModernTemplate({ portfolio }) {
+export function ModernTemplate({ portfolio }: { portfolio: Portfolio }) {
   const { data } = portfolio;
 
   return (
@@ -186,9 +222,8 @@ export function ModernTemplate({ portfolio }) {
                       {project.projectUrl ? (
                         <Button
                           asChild
-                          className="mt-4"
                           variant="outline"
-                          className="border-teal text-teal hover:bg-teal/10"
+                          className="mt-4 border-teal text-teal hover:bg-teal/10"
                         >
                           <a
                             href={project.projectUrl}
