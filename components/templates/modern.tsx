@@ -58,11 +58,15 @@ function Carousel({ assets }: { assets: any[] }) {
     },
     customPaging: (i: number) => {
       const asset = assets[i];
+      const isActive = i === currentSlide;
       return (
         <a>
           <div
-            style={{ backgroundColor: "#146864" }}
-            className="w-5 h-5 rounded-lg"
+            style={{ 
+              backgroundColor: "#146864",
+              opacity: isActive ? 1 : 0.4
+            }}
+            className="w-5 h-5 rounded-lg transition-opacity duration-200"
           />
         </a>
       );
