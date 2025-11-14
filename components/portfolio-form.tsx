@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Loader2, Plus, Trash2 } from "lucide-react"
+import type React from "react"
+import { Loader2, Plus, Trash2, GripVertical } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,6 +34,7 @@ export function PortfolioForm({ initialData, onSave }) {
   const [newAssetUrl, setNewAssetUrl] = useState("")
   const [newAssetType, setNewAssetType] = useState("image")
   const [activeProjectId, setActiveProjectId] = useState(null)
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -138,6 +140,23 @@ export function PortfolioForm({ initialData, onSave }) {
           : project,
       ),
     })
+  }
+
+  const handleDragStart = (index: number) => {
+    setDragIndex(index)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+  }
+
+  const handleDrop = (index: number) => {
+    if (dragIndex === null || dragIndex === index) return
+    const updated = [...formData.projects]
+    const [moved] = updated.splice(dragIndex, 1)
+    updated.splice(index, 0, moved)
+    setFormData({ ...formData, projects: updated })
+    setDragIndex(null)
   }
 
   const handleSubmit = async (e) => {
@@ -279,11 +298,14 @@ export function PortfolioForm({ initialData, onSave }) {
         )}
 
         <div className="space-y-6">
-          {formData.projects.map((project) => (
-            <Card key={project.id} className="overflow-hidden border-muted hover:border-teal transition-colors">
+          {formData.projects.map((project, index) => (
+            <Card key={project.id} className="overflow-hidden border-muted hover:border-teal transition-colors" onDragOver={handleDragOver} onDrop={() => handleDrop(index)}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-lg font-medium text-teal">{project.title || "New Project"}</h4>
+                  <div className="flex items-center gap-2" draggable onDragStart={() => handleDragStart(index)}>
+                    <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
+                    <h4 className="text-lg font-medium text-teal">{project.title || "New Project"}</h4>
+                  </div>
                   <Button
                     type="button"
                     onClick={() => handleRemoveProject(project.id)}
