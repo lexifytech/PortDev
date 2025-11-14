@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type React from "react"
 import { Loader2, Plus, Trash2, GripVertical } from "lucide-react"
 
@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 
-export function PortfolioForm({ initialData, onSave }) {
+export function PortfolioForm({ initialData, onSave, onChange }) {
   const { toast } = useToast()
   const [formData, setFormData] = useState(
     initialData || {
@@ -35,6 +35,11 @@ export function PortfolioForm({ initialData, onSave }) {
   const [newAssetType, setNewAssetType] = useState("image")
   const [activeProjectId, setActiveProjectId] = useState(null)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
+  useEffect(() => {
+    if (onChange) {
+      onChange(formData)
+    }
+  }, [formData, onChange])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -190,7 +195,7 @@ export function PortfolioForm({ initialData, onSave }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
       <div className="space-y-4">
         <h3 className="text-lg font-medium text-teal">Personal Information</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -499,16 +504,7 @@ export function PortfolioForm({ initialData, onSave }) {
         </div>
       </div>
 
-      <Button type="submit" disabled={isLoading} className="w-full bg-teal hover:bg-teal/90">
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Saving...
-          </>
-        ) : (
-          "Save Portfolio"
-        )}
-      </Button>
+>
     </form>
   )
 }

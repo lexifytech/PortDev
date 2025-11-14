@@ -19,6 +19,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [publishLoading, setPublishLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("template")
+  const [editedData, setEditedData] = useState(null)
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -104,6 +105,9 @@ export default function DashboardPage() {
   const handlePublish = async () => {
     setPublishLoading(true)
     try {
+      if (editedData || portfolio?.data) {
+        await handlePortfolioUpdate(editedData ?? portfolio?.data)
+      }
       const response = await fetch("/api/portfolio/publish", {
         method: "POST",
         headers: {
@@ -179,7 +183,13 @@ export default function DashboardPage() {
                   <CardDescription>Add your information and projects to your portfolio.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {portfolio && <PortfolioForm initialData={portfolio.data} onSave={handlePortfolioUpdate} />}
+                  {portfolio && (
+                    <PortfolioForm
+                      initialData={portfolio.data}
+                      onSave={handlePortfolioUpdate}
+                      onChange={setEditedData}
+                    />
+                  )}
                 </CardContent>
                 <CardFooter className="flex justify-between">
                   <Button
