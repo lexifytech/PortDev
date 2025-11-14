@@ -39,6 +39,22 @@ export async function middleware(request) {
     }
   }
 
+  if (pathname === "/login") {
+    const token = await getToken({ req: request })
+    if (token) {
+      const url = new URL("/dashboard", request.url)
+      return NextResponse.redirect(url)
+    }
+  }
+
+  if (pathname === "/") {
+    const token = await getToken({ req: request })
+    if (token) {
+      const url = new URL("/dashboard", request.url)
+      return NextResponse.redirect(url)
+    }
+  }
+
   // Check if this might be a portfolio slug
   const slug = pathname.slice(1) // Remove leading slash
   
